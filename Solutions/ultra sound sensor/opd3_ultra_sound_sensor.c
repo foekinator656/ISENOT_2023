@@ -5,23 +5,22 @@
 #include "simpletools.h"                      // Include simple tools
 #include "mstimer.h"
 #include "ping.h"
+#define PINGPIN 8
+#define PING_SOS_M_PER_SEC 344.8
+#define PING_SOS_M_PER_MICROSEC PING_SOS_M_PER_SEC/10000
 
-int measurePotentiometer(){
-    high(POTENTIOPIN);
-    pause(1);
-    return rc_time(POTENTIOPIN, 1);
-  }
-  
-void bereikMetenPotentioMeter(){
-    while(1){
-      print("%d \n", measurePotentiometer());
-      }
-  }  
+
+
+float pingCmDistanceFloat()
+{
+    float distanceFloat_CM = ping(PINGPIN)*PING_SOS_M_PER_MICROSEC/2;
+    return distanceFloat_CM; 
+}
+
 
 int main()                                    // Main function
 {
   
-  //bereikMetenPotentioMeter();
   pause(500);
   printf("start within 0.5s \n");
   pause(450);
@@ -33,16 +32,6 @@ int main()                                    // Main function
   mstime_start();
  
   for(int i = 0; i<measurementAttempts; i++){ 
-    int newMeasurement = ping(PINGPIN);
-    if(newMeasurement!=currentMeasurement){
-      changeCounter++;
-      currentMeasurement=newMeasurement;
-      print("%d,%d\n",mstime_get(),currentMeasurement);
-      } 
-    pause(1); 
+    print("%d ,%.2f\n",mstime_get(), pingCmDistanceFloat());
   }  
-  int mstime = mstime_get();
-  printf("it took %dms \n", mstime);
-  printf("had %d changes \n", changeCounter);
-  printf("ESR is %.0f/s", ((float)changeCounter)/((float)mstime)*1000); // changes/time(MS) = sampling rate MS, sampling rate MS*1000 = sampling rate S
 }
