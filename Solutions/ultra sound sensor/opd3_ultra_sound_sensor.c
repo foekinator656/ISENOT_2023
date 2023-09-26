@@ -1,6 +1,5 @@
 #define PINGPIN 8
 #define measurementAttempts 200
-#define POTENTIOPIN 7
 
 #include "simpletools.h"                      // Include simple tools
 #include "mstimer.h"
