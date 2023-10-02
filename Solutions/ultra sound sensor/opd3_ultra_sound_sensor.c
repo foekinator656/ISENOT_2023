@@ -1,6 +1,5 @@
 #define PINGPIN 8
 #define measurementAttempts 200
-#define POTENTIOPIN 7
 
 #include "simpletools.h"                      // Include simple tools
 #include "mstimer.h"
@@ -8,6 +7,7 @@
 #define PINGPIN 8
 #define PING_SOS_M_PER_SEC 344.8
 #define PING_SOS_M_PER_MICROSEC PING_SOS_M_PER_SEC/10000
+#define measuretime 50
 
 
 
@@ -17,6 +17,11 @@ float pingCmDistanceFloat()
     return distanceFloat_CM; 
 }
 
+int waitMeasureTime(int lastTimeStamp){
+    int mstime =  mstime_get();
+    pause(measuretime-mstime+lastTimeStamp);
+    return mstime_get();
+  }
 
 int main()                                    // Main function
 {
@@ -30,16 +35,18 @@ int main()                                    // Main function
   float currentMeasurement = -1; // the last measurement the device made
   int changeCounter = 0; // counter for the amount of measurements that differ from the last one.
   mstime_start();
-
+  int lastTimeStamp = 0;
  
   for(int i = 0; i<measurementAttempts; i++){ 
     float newMeasurement = pingCmDistanceFloat();
-     
-    print("%d ,%.2f\n",mstime_get(), newMeasurement);
+    int mstime =  mstime_get();
+    print("%d ,%.2f\n", mstime, newMeasurement);
+
     if(newMeasurement!=currentMeasurement){
         changeCounter++;
         currentMeasurement=newMeasurement;
     }
+    lastTimeStamp = waitMeasureTime(lastTimeStamp);
   }
   int mstime = mstime_get();
   printf("it took %dms \n", mstime);

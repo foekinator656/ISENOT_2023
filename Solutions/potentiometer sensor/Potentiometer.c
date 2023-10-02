@@ -23,7 +23,7 @@ void measureRange(){
 
 void createGaphData(){
    mstime_start();
-  for(int i = -25; i<measurementAttempts; i++){ 
+  for(int i = -25; i<measurementAttempts; i++){// -25 off set to begin prints
       printf("%d, %d, %ld \n",i ,  mstime_get(), measurePotentiometer());
     }
   }
