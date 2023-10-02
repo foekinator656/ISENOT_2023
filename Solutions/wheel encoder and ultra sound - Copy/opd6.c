@@ -85,12 +85,10 @@ int main()
    }
     
     if(objectFound && array[i]<=doelAfstand){
-      
       if(distance<currentClosestDistance){
         currentIsClosest = 1;
         currentClosestDistance = distance;
       }    
-      
    }
     
     if(objectFound && array[i]>doelAfstand){
