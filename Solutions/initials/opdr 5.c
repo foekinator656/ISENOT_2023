@@ -47,7 +47,7 @@ int main()                                    // Main function
   // begin letter L
  drive_goto(cm2ticks(14.),cm2ticks(14.));
  rotateBot(-90.);
- drive_goto(cm2ticks(-6.),cm2ticks(-6.));
+ drive_goto(cm2ticks(-8.),cm2ticks(-8.));
  drive_goto(cm2ticks(8.),cm2ticks(8.));
  
  
