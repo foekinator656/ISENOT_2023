@@ -1,14 +1,9 @@
-/*
-  Blank Simple Project.c
-  http://learn.parallax.com/propeller-c-tutorials 
-*/
-#include "simpletools.h"                      // Include simple tools
-
+/* Forward then Stop.c */
 #include "simpletools.h"
 #include "abdrive360.h"
 
 const float input_drive_length_in_cm = 50.;
-const float input_turning_in_degrees = 60.;
+const float input_turning_in_degrees = 380.;
 const float pi = 3.14159265359;
 const float botWidth = 10.58; // in cm
 
@@ -41,20 +36,11 @@ void rotateBot(float angle){ // + angle = right turning or - angle = left turnin
   drive_goto(degrees2ticks(angle), -degrees2ticks(angle));
 }  
 
-
-int main()                                    // Main function
-{
-  // begin letter L
- drive_goto(cm2ticks(14.),cm2ticks(14.));
- rotateBot(-90.);
- drive_goto(cm2ticks(-8.),cm2ticks(-8.));
- drive_goto(cm2ticks(8.),cm2ticks(8.));
- 
- 
- // begin letter R
- rotateBot(-90.);
- drive_goto(cm2ticks(12.),cm2ticks(12.));
- drive_goto(cm2ticks(-2.),cm2ticks(-2.));
- rotateBot(45.);
-
+int main()                    
+{ 
+  pause(2000);  
+  // assignment "Draai-op-de-plaats"
+  rotateBot(input_turning_in_degrees);
+  pause(10);
+  rotateBot(-input_turning_in_degrees);
 }

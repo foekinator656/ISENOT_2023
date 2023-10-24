@@ -4,12 +4,10 @@
 */
 #include "simpletools.h"                      // Include simple tools
 
-
-
 int main()                                    // main function             
 {
-  outputwaveup(2200,3000, 40);
-  outputwavedown(2900,3000, 5);
+  outputwaveup(3000,3500, 50);
+  outputwavedown(2000,3000, 20);
   square_wave_stop();
   
 }
