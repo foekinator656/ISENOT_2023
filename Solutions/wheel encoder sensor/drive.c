@@ -3,7 +3,6 @@
 #include "abdrive360.h"
 
 const float input_drive_length_in_cm = 50.;
-const float input_turning_in_degrees = 60.;
 const float pi = 3.14159265359;
 const float botWidth = 10.58; // in cm
 
