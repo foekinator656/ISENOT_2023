@@ -42,4 +42,8 @@ int main()
   rotateBot(input_turning_in_degrees);
   pause(10);
   rotateBot(-input_turning_in_degrees);
+  pause(10);
+  rotateBot(-input_turning_in_degrees);
+  pause(10);
+  rotateBot(input_turning_in_degrees);
 }
