@@ -1,9 +1,8 @@
 /* Forward then Stop.c */
 #include "simpletools.h"
-#include "abdrive360.h"
+#include "abdrive.h"
 
-const float input_drive_length_in_cm = 50.;
-const float input_turning_in_degrees = 380.;
+const float input_turning_in_degrees = 60.;
 const float pi = 3.14159265359;
 const float botWidth = 10.58; // in cm
 
@@ -43,4 +42,8 @@ int main()
   rotateBot(input_turning_in_degrees);
   pause(10);
   rotateBot(-input_turning_in_degrees);
+  pause(10);
+  rotateBot(-input_turning_in_degrees);
+  pause(10);
+  rotateBot(input_turning_in_degrees);
 }
