@@ -8,15 +8,13 @@
 #include "wavplayer.h "
 int main()                                    // Main function
 {
- talk * test = talk_run(7, -1);
- talk_say(test, "ffffffff");
+ talk * test = talk_run(26, 27);
  sd_mount(22, 23, 24, 25);
  wav_volume(5);
  while(1){
     pause(150);
-    talk_say(test, "nyaaan");
     if(!wav_playing()){
-       wav_play("BIRD.WAV");
+       wav_play("TESTS.WAV");
       }
   }
 }

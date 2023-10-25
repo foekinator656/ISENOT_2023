@@ -1,7 +1,7 @@
 
 #define POTENTIOPIN 5
 #define sensorUseage 2 //0=sampling rate 1=range 2=graphdata
-#define measurementAttempts 200
+#define measurementAttempts 500
 
 
 #include "simpletools.h"                    
