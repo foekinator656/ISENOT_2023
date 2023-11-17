@@ -1,13 +1,13 @@
 /* Forward then Stop.c */
 #include "simpletools.h"
-#include "abdrive.h"
+#include "abdrive360.h"
 #include "ping.h"
 
-const float input_drive_length_in_cm = 50.;
-const float input_turning_in_degrees = 20.;
+const float input_drive_length_in_cm = 20.;
+const float input_turning_in_degrees = 90.;
 const float pi = 3.14159265359;
 const float botWidth = 10.58; // in cm
-const int doelAfstand = 50; // in cm
+const int doelAfstand = 40; // in cm
 const int PINGPIN = 8;
 
 int roundFloat(float a){
@@ -27,9 +27,6 @@ float cm2ticks(float lengthInCm){
 
 float degrees2ticks(float degrees){
   float deg2rad = pi/180.;
-  // curve length = r * phi
-  // r = 0.5 * botWidth
-  // phi = deg2rad * degrees
   float curveLength = 0.5 * botWidth * deg2rad * degrees;
   int ticks = cm2ticks(curveLength);
   return ticks;
@@ -48,58 +45,68 @@ int main()
   int minTick = degrees2ticks(-input_turning_in_degrees);
   int maxTick = degrees2ticks(input_turning_in_degrees);
   
-  rotateBotTicks(minTick);
-  
-  int tickpos = minTick;
-  int arraySize = maxTick-minTick+1;
-  
-  int arr[arraySize];
-  int* array = &arr[maxTick];
-  
-  while (tickpos<=maxTick) {
-      int distance = ping_cm(PINGPIN);
-      array[tickpos] = distance;
-      print("tickpos: %d, distance: %d \n",tickpos, array[tickpos]);
-      tickpos = tickpos +1;
-      rotateBotTicks(1);
-  }
-  rotateBotTicks(-maxTick);
-  
-  int objectStart= 10000;
-  int objectFound= 0;
-  int currentIsClosest = 0;
-  int currentClosestMidpointTickCount= 10000;
-  int currentClosestDistance= 10000;
-  
-  for(int i = minTick; i<maxTick; i++){
-    int distance = array[i];
+
+  while(1){
+    rotateBotTicks(minTick);
+    int tickpos = minTick;
+    int arraySize = maxTick-minTick+1;
     
-    if(!objectFound && array[i]<doelAfstand){
-      objectStart = i;
-      objectFound = 1; 
+    int arr[arraySize];
+    int* array = &arr[maxTick];
+    while (tickpos<=maxTick) {
+        int distance = ping_cm(PINGPIN);
+        array[tickpos] = distance;
+        tickpos = tickpos +1;
+        rotateBotTicks(1);
+    }
+    rotateBotTicks(-maxTick);
+    
+    int objectStart= 10000;
+    int objectFound= 0;
+    int aObjectFound= 0;
+    int currentIsClosest = 0;
+    int currentClosestMidpointTickCount= -10000;
+    int currentClosestDistance= 10000;
+    
+    for(int i = minTick; i<maxTick; i++){
+      int distance = array[i];
       
-      if(distance<currentClosestDistance){
-        currentIsClosest = 1;
-        currentClosestDistance = distance;
-      }     
-   }
+      if(!objectFound && array[i]<doelAfstand){
+        objectStart = i;
+        objectFound = 1;
+        aObjectFound= 1;
+     }
+      
+      if(objectFound && array[i]<=doelAfstand){
+        if(distance<currentClosestDistance){
+          currentIsClosest = 1;
+          currentClosestDistance = distance;
+        }    
+     }
+     if(objectFound && array[i]>doelAfstand){
+       if(currentIsClosest){
+           currentClosestMidpointTickCount = (objectStart+i-1)/2;
+           currentIsClosest = 0;
+        }                
+       objectFound = 0;
+      } 
+      if(objectFound && i==maxTick-1){
+        if(currentIsClosest){
+           currentClosestMidpointTickCount = (objectStart+i-1)/2;
+           currentIsClosest = 0;
+        }                
+       objectFound = 0;
+      }
+    }
+    if(aObjectFound == 0){
+          break;
+    }
     
-    if(objectFound && array[i]<=doelAfstand){
-      if(distance<currentClosestDistance){
-        currentIsClosest = 1;
-        currentClosestDistance = distance;
-      }    
-   }
-    
-    if(objectFound && array[i]>doelAfstand){
-      if(currentIsClosest){
-          currentClosestMidpointTickCount = (objectStart+i)/2;
-          currentIsClosest = 0;
-      }                
-      objectFound = 0;
-    }  
+    rotateBotTicks(currentClosestMidpointTickCount);
+    drive_goto(cm2ticks(doelAfstand)*1.1, cm2ticks(doelAfstand)*1.1);
+    drive_goto(-cm2ticks(doelAfstand*1.1), -cm2ticks(doelAfstand)*1.1); 
+    rotateBotTicks(-currentClosestMidpointTickCount);
   }    
-  print("%d", currentClosestMidpointTickCount);
 }
 int backup()                    
 {

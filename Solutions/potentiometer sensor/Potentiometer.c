@@ -1,5 +1,5 @@
 #define POTENTIOPIN 7
-#define sensorUseage 2 //0=sampling rate 1=range 2=graphdata
+#define sensorUseage 0 //0=sampling rate 1=range 2=graphdata
 #define measurementAttempts 500
 
 
@@ -34,21 +34,15 @@ void measureSamplingrate(){
   pause(200);
 
   long currentMeasurement = -1; // the last measurement the device made
-  int changeCounter = 0; // counter for the amount of measurements that differ from the last one.
   mstime_start();
  
   for(int i = 0; i<measurementAttempts; i++){ 
-    long newMeasurement = measurePotentiometer();
-    if(newMeasurement!=currentMeasurement){
-      changeCounter++;
-      currentMeasurement=newMeasurement;
-      } 
+    printf("%d, %ld \n",  mstime_get(), measurePotentiometer());
     pause(1); 
   }  
   int mstime = mstime_get();
   printf("it took %dms \n", mstime);
-  printf("had %d changes \n", changeCounter);
-  printf("ESR is %.0f/s", ((float)changeCounter)/((float)mstime)*1000); // changes/time(MS) = sampling rate MS, sampling rate MS*1000 = sampling rate S
+  printf("ESR is %.0f/s", ((float)measurementAttempts)/((float)mstime)*1000); // changes/time(MS) = sampling rate MS, sampling rate MS*1000 = sampling rate S
 }
 
 

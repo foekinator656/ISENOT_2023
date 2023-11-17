@@ -1,6 +1,6 @@
 
-#define POTENTIOPIN 5
-#define sensorUseage 2 //0=sampling rate 1=range 2=graphdata
+#define LIGHTPIN 5
+#define sensorUseage 0 //0=sampling rate 1=range 2=graphdata
 #define measurementAttempts 500
 
 
@@ -10,22 +10,22 @@
 
 //reference document https://learn.parallax.com/tutorials/language/blocklyprop/circuit-practice-blocklyprop/potentiometer-position
 
-float measurePotentiometer(){
-    high(POTENTIOPIN);
+float measureLightSensor(){
+    high(LIGHTPIN);
     pause(1);
-    return ((float)rc_time(POTENTIOPIN, 1))/(1000000);
+    return ((float)rc_time(LIGHTPIN, 1))/(1000000);
   }
   
 void measureRange(){
     while(1){
-      printf("%ld \n", measurePotentiometer());
+      printf("%ld \n", measureLightSensor());
       }
   }  
 
 void createGaphData(){
   mstime_start();
   for(int i = -23; i<measurementAttempts; i++){// -25 off set to begin prints
-      printf("%d, %0.8f \n",  mstime_get(), measurePotentiometer());
+      printf("%d, %0.6f \n",  mstime_get(), measureLightSensor());
     }
   }
   
@@ -35,21 +35,16 @@ void measureSamplingrate(){
   pause(200);
 
   float currentMeasurement = -1; // the last measurement the device made
-  int changeCounter = 0; // counter for the amount of measurements that differ from the last one.
   mstime_start();
  
   for(int i = 0; i<measurementAttempts; i++){ 
-    long newMeasurement = measurePotentiometer();
-    if(newMeasurement!=currentMeasurement){
-      changeCounter++;
-      currentMeasurement=newMeasurement;
-      } 
+    float newMeasurement = measureLightSensor();
+    printf("%d, %0.6f \n",  mstime_get(), newMeasurement);
     pause(1); 
   }  
   int mstime = mstime_get();
   printf("it took %dms \n", mstime);
-  printf("had %d changes \n", changeCounter);
-  printf("ESR is %.0f/s", ((float)changeCounter)/((float)mstime)*1000); // changes/time(MS) = sampling rate MS, sampling rate MS*1000 = sampling rate S
+  printf("SR is %.0f/s", ((float)measurementAttempts)/((float)mstime)*1000); // changes/time(MS) = sampling rate MS, sampling rate MS*1000 = sampling rate S
 }
 
 

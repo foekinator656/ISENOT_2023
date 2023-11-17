@@ -1,15 +1,14 @@
-#include "simpletools.h"                      // Include simpletools header
-#include "ping.h"                             // Include ping header
-#include <datetime.h>
+#define PINGPIN 8
+#define measurementAttempts 200
 
-
-#define firsttest 1
+#include "simpletools.h"                      // Include simple tools
+#include "mstimer.h"
+#include "ping.h"
 #define PINGPIN 8
 #define PING_SOS_M_PER_SEC 344.8
 #define PING_SOS_M_PER_MICROSEC PING_SOS_M_PER_SEC/10000
+#define measuretime 50
 
-
-typedef datetime;
 
 
 float pingCmDistanceFloat()
@@ -18,38 +17,72 @@ float pingCmDistanceFloat()
     return distanceFloat_CM; 
 }
 
-
-int main(){
-  while(0){
-  float variable = pingCmDistanceFloat();
-  printf("%.4f \n",variable);
-  }  
-  //exit(0);
-  printf("start within 0.5s \n");
-  pause(500);
-  int startTime = dt_getms();
-  int currentDist = ping(PINGPIN);
-  print("%d", currentDist);
-  int shortestDuration = 1000;
-  int startRotationTimeStamp = startTime;
-   
-  while(startTime+2000>dt_getms()){
-   int newDist = ping(PINGPIN);            
-   if(currentDist!=newDist){
-     currentDist = newDist;
-     int duration_ms = dt_getms() - startRotationTimeStamp;
-     if(duration_ms<shortestDuration){
-        shortestDuration = duration_ms;
-       }
-     int startRotationTimeStamp = dt_getms();
-    }    
+int waitMeasureTime(int lastTimeStamp){
+    int mstime =  mstime_get();
+    pause(measuretime-mstime+lastTimeStamp);
+    return mstime_get();
   }
+#define RUNAVG_T_NSAMPLES 40
+
+typedef struct
+{
+  float samples[RUNAVG_T_NSAMPLES];  
+  int iNewestSample;
+  float runningSum;
   
-  print("shortest duration: %d \n", shortestDuration);
-  print("ESP: %f", 1/(((float)shortestDuration)/1000));
-  return 0;
+} runAvg_t;
+
+float runAvg_init (runAvg_t *runAvg, float initSample){
+    for(int i = 0; i< RUNAVG_T_NSAMPLES; i++){
+      runAvg->samples[i] = initSample;
+    } 
+    runAvg->iNewestSample = RUNAVG_T_NSAMPLES-1;  
+    runAvg->runningSum = initSample*RUNAVG_T_NSAMPLES;
+    
+    return initSample;     
+  }
+
+float runAvg_update (runAvg_t *runAvg, float initSample){
+  int iOldestSample = (runAvg->iNewestSample+1) % RUNAVG_T_NSAMPLES;
+  runAvg->runningSum -= runAvg->samples[iOldestSample];
+  runAvg->runningSum += initSample;
+  runAvg->samples[iOldestSample] = initSample;
+  runAvg->iNewestSample+= iOldestSample;
+
+  
+  return runAvg->runningSum/RUNAVG_T_NSAMPLES;
+  }
+
+int main()                                    // Main function
+{
+  
+  pause(500);
+  printf("start within 0.5s \n");
+  pause(450);
+  printf("start");
+  pause(50);
+
+  float currentMeasurement = -1; // the last measurement the device made
+  int changeCounter = 0; // counter for the amount of measurements that differ from the last one.
+  mstime_start();
+  int lastTimeStamp = 0;
+  runAvg_t runningAverage;
+  
+  runAvg_init (&runningAverage, pingCmDistanceFloat ( ));
+ 
+  for(int i = 0; i<measurementAttempts; i++){ 
+    float newMeasurement = pingCmDistanceFloat ( );
+    int mstime =  mstime_get ( );
+    print("%d ,%.2f, %.2f\n", mstime, newMeasurement, runAvg_update (&runningAverage, newMeasurement));
+
+    if(newMeasurement!=currentMeasurement){
+        changeCounter++;
+        currentMeasurement=newMeasurement;
+    }
+    lastTimeStamp = waitMeasureTime (lastTimeStamp);
+  }
+  int mstime = mstime_get();
+  printf("it took %dms \n", mstime);
+  printf("had %d changes \n", changeCounter);
+  printf("ESR is %.0f/s", ((float)changeCounter)/((float)mstime)*1000);  
 }
-
-
-
-
