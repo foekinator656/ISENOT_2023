@@ -40,10 +40,6 @@ int main()
   pause(2000);  
   // assignment "Draai-op-de-plaats"
   rotateBot(input_turning_in_degrees);
-  pause(10);
-  rotateBot(-input_turning_in_degrees);
-  pause(10);
-  rotateBot(-input_turning_in_degrees);
-  pause(10);
-  rotateBot(input_turning_in_degrees);
+  pause(30000);
+  rotateBot(-input_turning_in_degrees); 
 }
